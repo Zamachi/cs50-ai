@@ -1,0 +1,12 @@
+#+TITLE: Intro
+#+PROPERTY: header-args:python :tangle ./intro.py :mkdirp yes
+
+This is an intro "notebook" for the introductory lesson
+* Terminology
+
+First we have to introduce ourselves to certain terminology frequently used in the AI field:
+* Code
+
+#+begin_src python
+print("Hello!")
+#+end_src
