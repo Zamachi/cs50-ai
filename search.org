@@ -1,0 +1,122 @@
+#+TITLE: Search
+#+PROPERTY: header-args:python :tangle search.py :mkdirp yes
+
+This is a lesson on searching, or a problem in which an *agent* is given an *initial state* and a *goal state* , and it has to find a specific *set of actions* to reach the latter from the former.
+
+* Essential Terminology
+
+- Agent - an entity(usually a program) that is aware of its environment, perceives it a certain way and acts upon it
+- State - "state" of *environment* and the *agent* itself
+- Initial state - state in which the agent "begins" - where the *Search algorithm* starts
+- Actions - choices we can make in any given state. We'll define a function "*ACTION(s)*" which returns a set of actions that can be executed in state *s*
+- Transition model - we can define it as a function "*RESULT( s, a )*" which returns a resulting state, after performing action *a* on the state *s*
+- State space - a set of all possible( reachable ) states from the *initial state* by any *sequence of actions*
+- Goal test - test whether a given state is the *goal state*
+- Path cost function - a number which describes the cost of taking a certain path. Usually we want the *optimal* (shortest) path, which is why we aim to find the shortest one if possible
+
+* Data structures
+Here we will declare data structures that will be used in the *Search problem*
+** Node
+
+    A simple data structure that will keep track of:
+
+    - Current state
+    - Parent node (where we came from)
+    - An action which was applied to a parent node to get to the current one
+    - A path cost - a number which describes the "cost" of a path( bigger means worse ) from initial state to the current one.
+
+** Frontier
+
+    A frontier is a simple container where we will initially store the *initial state*, and then, after we move from one state to another, we shall store in it states that can be reached from the *current state* by applying a certain *action*
+
+** Explored set
+
+    Explored set is where we keep track of *nodes we have visited* , so we don't end up in an *infinite loop* !
+
+** Stack
+
+    We will use stacks( *LIFO* ) for removing nodes from the *frontier* - we will incorporate it with the *DFS* algorithm.
+
+** Queues
+
+    We will use queues( *FIFO* ) for removing nodes from the *frontier* - we will incorporate it with the *BFS* algorithm
+
+* Approach
+
+The approach to solving a *Search problem* is the following:
+
+    1. Start with a *frontier* that contains only *the initial state*
+    2. Initialize the empty explored set
+    3. Repeat the following:
+       a. If the frontier is *empty*, then there is *no solution*
+       b. Remove a node from the frontier - *IMPORTANT FOR OPTIMIZATION!* we can't choose randomly if we want an optimal solution. We will use *BFS* or *DFS* strategies to choose the optimal solution.
+       c. If node contains a goal state - return the *solution*
+       d. Add the node to the *explored set*
+       e. *Expand the node* - add nodes we have "discovered" to the *frontier* ( if they already aren't in the frontier or *the explored set* )
+
+** Depth First Search
+
+    As mentioned before, this search algorithm utilizes *stack data structure*.
+
+    Pros:
+        - The best-case scenario is: this algorithm is the fastest if luck plays in its favor
+    Cons:
+        - The solution it finds *isn't guaranteed* to be optimal!
+        - At worst - it explores every possible path before it finds the solution, thus taking the longest time
+
+** Breadth First Search
+
+    As mentioned before, this search algorithm utilizes *queue data structure*.
+
+    Pros:
+        - Guaranteed to find optimal solution - WHY?
+    Cons:
+        - Runs longer than minimal runtime - almost guaranteed
+        - At worst, just as *DFS* , takes longest time to run.
+
+* Code
+
+#+begin_src python
+
+import sys
+
+class Node():
+    def __init__(self, state, parent, action):
+        self.state   = state
+        self.parent  = parent
+        self.action  = action
+
+class StackFrontier():
+    def __init__(self):
+        self.frontier = []
+
+    def add(self, node):
+        self.frontier.append(node)
+
+    def contains_state(self,state):
+        return any(node.state == state for node in self.frontier)
+
+    def empty(self):
+        return len(self.frontier) == 0
+
+    def remove(self):
+        if self.empty():
+            raise Exception("empty frontier")
+        else:
+            node = self.frontier[-1]
+            self.frontier = self.frontier[:-1]
+            return node
+
+class QueueFrontier(StackFrontier):
+    def remove(self):
+        if self.empty():
+            raise Exception("empty frontier")
+        else:
+            node = self.frontier[0]
+            self.frontier = self.frontier[1:]
+            return node
+
+class Maze():
+    def __init__(self, filename):
+        self.filename = filename
+#+end_src

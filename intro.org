@@ -1,67 +1,16 @@
 #+TITLE: Intro
-#+PROPERTY: header-args:python :tangle ./intro.py :mkdirp yes
 
 This is an intro "notebook" for the introductory lesson
+
 * Basic Terminology
 
-First we have to introduce ourselves to certain terminology frequently used in the AI field:
+Core ideas of artificial intelligence ( *AI* ):
 
+- Search - finding *something* (a path for example) from start *(initial state)* to the goal ( *goal state* )
 - Knowledge - store information, internal representation of information and drawing inferences from it, that is make conclusions
 - Uncertainty - dealing with "uncertain events" using probability
 - Optimization - choose the optimal (the best) solution
 - Machine learning - learning from *data* and *experience*
 - Neural network - imitating a human brain
 - Natural Language Processing - make a computer understand human languages
-- Search - finding *something* (a path for example) from start *(initial state)* to the goal ( *goal state* )
 
-- Agent - an entity(usually a program) that is aware of its environment, perceives it a certain way and acts upon it
-- State - "state" of *environment* and the *agent* itself
-- Initial state - state in which the agent "begins" - where the *Search algorithm* starts
-- Actions - choices we can make in any given state. We'll define a function "*ACTION(s)*" which returns a set of actions that can be executed in state *s*
-- Transition model - we can define it as a function "*RESULT( s, a )*" which returns a resulting state, after performing action *a* on the state *s*
-- State space - a set of all possible( reachable ) states from the *initial state* by any *sequence of actions*
-- Goal test - test whether a given state is the *goal state*
-- Path cost function - a number which describes the cost of taking a certain path
-* Data structures
-Here we will declare data structures that will be used in the *Search problem*
-** Node
-
-    A simple data structure that will keep track of:
-
-    - Current state
-    - Parent node (where we came from)
-    - An action which was applied to a parent node to get to the current one
-    - A path cost - a number which describes the "cost" of a path( bigger means worse ) from initial state to the current one.
-** Frontier
-
-    A frontier is a simple container where we will initially store the *initial state*, and then, after we move from one state to another, we shall store in it states that can be reached from the *current state* by applying a certain *action*
-** Explored set
-
-    Explored set is where we keep track of *nodes we have visited* , so we don't end up in an *infinite loop* !
-
-** Stack
-
-    We will use stacks( *LIFO* ) for removing nodes from the *frontier* - we will incorporate it with the *DFS* algorithm.
-
-** Queues
-
-    We will use queues( *FIFO* ) for removing nodes from the *frontier* - we will incorporate it with the *BFS* algorithm
-
-* Approach
-
-The approach to solving a *Search problem* is the following:
-
-    1. Start with a *frontier* that contains only *the initial state*
-    2. Initialize the empty explored set
-    3. Repeat the following:
-       a. If the frontier is *empty*, then there is *no solution*
-       b. Remove a node from the frontier - *IMPORTANT FOR OPTIMIZATION!* we can't choose randomly if we want an optimal solution. We will use *BFS* or *DFS* strategies to choose the optimal solution.
-       c. If node contains a goal state - return the *solution*
-       d. Add the node to the *explored set*
-       e. *Expand the node* - add nodes we have "discovered" to the *frontier* ( if they already aren't in the frontier or *the explored set* )
-
-* Code
-
-#+begin_src python
-print("Hello!")
-#+end_src
