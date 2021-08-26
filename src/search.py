@@ -208,3 +208,5 @@ class Maze():
                 )
 
         img.save(filename)
+
+print("Putanja je:\n" , sys.path)

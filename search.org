@@ -1,5 +1,5 @@
 #+TITLE: Search
-#+PROPERTY: header-args:python :tangle search.py :mkdirp yes
+#+PROPERTY: header-args:python :tangle "src/search.py" :mkdirp yes
 
 This is a lesson on searching, or a problem in which an *agent* is given an *initial state* and a *goal state* , and it has to find a specific *set of actions* to reach the latter from the former.
 
