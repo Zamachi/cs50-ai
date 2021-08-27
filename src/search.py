@@ -161,6 +161,7 @@ class Maze():
 
     def output_image(self, filename, show_solution=True, show_explored=False):
         from PIL import Image, ImageDraw
+
         cell_size = 50
         cell_border = 2
 
@@ -202,11 +203,24 @@ class Maze():
 
                 # Draw cell
                 draw.rectangle(
-                    ([(j * cell_size + cell_border, i * cell_size + cell_border),
-                      ((j + 1) * cell_size - cell_border, (i + 1) * cell_size - cell_border)]),
+                    (
+                        ( (j * cell_size + cell_border, i * cell_size + cell_border),
+                          ( (j + 1) * cell_size - cell_border, (i + 1) * cell_size - cell_border) )
+                    ),
                     fill=fill
                 )
 
         img.save(filename)
 
-print("Putanja je:\n" , sys.path)
+if len(sys.argv) != 2:
+    sys.exit("Usage: python maze.py maze.txt")
+
+m = Maze(sys.argv[1])
+print("Maze:")
+m.print()
+print("Solving...")
+m.solve()
+print("States Explored:", m.num_explored)
+print("Solution:")
+m.print()
+m.output_image("maze.png", show_explored=True)
