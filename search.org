@@ -41,7 +41,7 @@ Here we will declare data structures that will be used in the *Search problem*
 
     We will use queues( *FIFO* ) for removing nodes from the *frontier* - we will incorporate it with the *BFS* algorithm
 
-* Approach
+* Initial Approach
 
 The approach to solving a *Search problem* is the following:
 
@@ -311,3 +311,26 @@ print("Solution:")
 m.print() # prints the solution somehow (?)
 m.output_image("maze.png", show_explored=True) # prints the solution image
 #+end_src
+
+*  Improved approach
+
+    In the improved method we shall use what is known as *informed  search*. The previous two: *BFS /and/ DFS* are known as *uninformed search* strategies, because they don't utilize available *information from the surroundings* to improve the search itself, that is, they are not very perceptive of their environment.
+
+    Informed searches, however, utilize this information to their advantage - to achieve a more optimal solution, or in our case - a *faster one*.
+    The implementation provided above isn't sufficient for it to be an informed search, because they use the *LIFO /and/ FIFO* data structures, inserting and reading data in no particular order, other than the order defined by the data structure itself - *this is inefficient* because if we *randomly insert* elements into DS, but read them in a particular order( *LIFO/FIFO* ), we wouldn't be choosing the most optimal path, but *a random one*.
+
+    To choose the most optimal, as we have said, we have to look at our *surroundings* and utilize available information to our advantage. One particular information available to us in the search problem of a *maze* is something what is known as *the Manhattan distance* or *how far away are we from the goal*. "/How far away/" is counted in "/how many blocks horizontally *and/or* vertically/" are we away - *we cannot go diagonally!*
+
+
+
+
+** Greedy Best-First Search Algorithm
+
+    This algorithm
+
+
+** A* search algorithm
+
+    This algorithm
+
+* Adversarial search
