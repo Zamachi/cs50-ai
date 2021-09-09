@@ -56,7 +56,8 @@ The approach to solving a *Search problem* is the following:
 
 ** Depth First Search
 
-    As mentioned before, this search algorithm utilizes *stack data structure*.
+    As mentioned before, this search algorithm utilizes *stack data structure( LIFO )*.
+    It goes /as deep as possible/ in one direction( in a *tree DS*, it goes out to the *leaves* ), before trying out other paths later.
 
     Pros:
         - The best-case scenario is: this algorithm is the fastest if luck plays in its favor
@@ -66,8 +67,8 @@ The approach to solving a *Search problem* is the following:
 
 ** Breadth First Search
 
-    As mentioned before, this search algorithm utilizes *queue data structure*.
-
+    As mentioned before, this search algorithm utilizes *queue data structure( FIFO )*.
+    It first explores the /"neighbouring"/ nodes (or one level away), then moves onto the next level.
     Pros:
         - Guaranteed to find optimal solution - WHY?
     Cons:
@@ -321,16 +322,38 @@ m.output_image("maze.png", show_explored=True) # prints the solution image
 
     To choose the most optimal, as we have said, we have to look at our *surroundings* and utilize available information to our advantage. One particular information available to us in the search problem of a *maze* is something what is known as *the Manhattan distance* or *how far away are we from the goal*. "/How far away/" is counted in "/how many blocks horizontally *and/or* vertically/" are we away - *we cannot go diagonally!*
 
-
-
-
 ** Greedy Best-First Search Algorithm
 
-    This algorithm
+    This algorithm is the first example of the /informed search strategy/ we will look at.
+    Namely, it *expands* (picks) a node that is the *closest* to the goal, which is determined by a *heuristic function h(n)* - iin our case is going to be the beforementioned /Manhattan distance/ . It's worth noting that Manhattan distance *ignores* /walls/, and only allows movement in a /non-diagonal way/.
 
+    However, even with an informed search such as *GBFS*, it still /doesn't guarantee/ an *optimal solution*.
+    Why? Well, if we only expand nodes that /appear/ closest to the goal state, then we only follow what seems to be the best path at any particular moment, which doesn't mean it won't, down the road, turn out to be less-efficient and longer...
+
+    Imagine the following scenario, you are given a choice between two paths:
+        1. Which leads to the *left*, and is therefore *1 Manhattan distance* further away from the goal state;
+        2. Which leads to the *right*, and is therefore *1 Manhattan distance* /closer/ to the goal state;
+    Well, if we know *GBFS* is /always/ going to choose (what appears to be) the /closest/ path, of course it's going to the right path...but what if that right path starts going around in circles, and down the road it turns out to be longer, than if we took the left? What if left only took 1 bad step(left), but later corrected itself, and turned out to be shorter than the right one? That is the disadvantage of this approach, which is why this algorithm has /"greedy"/ in the name.
+    This is why we will use an even better algorithm, which utilizes a better *heuristic function* - /A* search algorithm./
 
 ** A* search algorithm
 
-    This algorithm
+    Previous algorithm - *GBFS* utilized only a *heuristic function* - /h(n)/ - which was /the Manhattan distance/, or how far away is a given *state* from the *goal state*.
+    What /A*/ does better is it adds additional parameter to the *heuristic* - /g(n)/, which represents the *accumulated* cost from the /initial state/ to the /current state/. So in total, our *heuristic* currently looks like: /f(n) = h(n) + g(n)/, where /h(n)/ is our previous /Manhattan distance/ and /g(n)/ is how many steps in total did it take to get to the current state.
+    And now, the performance hog which existed in the previous algorithm is now fixed - once the *current* cost exceeds the /estimated/ cost of other available options, the algorithm will simply switch to them, instead of blindly following the /estimated distance form the goal state/ like h(n) did.
+
+    Now the posed question is, how optimal and efficient is this algorithm? As with any informed search - it is *only* as good as its /heuristic function/.
+    It is quite /possible/ that this algorithm can be less efficient than the previous one, or even the uninformed searches, but for it to be optimal, the /heuristic function/ *needs* to be:
+        1. *Admissible* - which means it *never* /overestimates/ the true cost, or rather, the *estimated* cost is  *less* or /equal/ to the real one.
+        2. *Consistent* - for every node /n/ and its *successor* /n'/ with *step cost* /c/, the following has to apply: /h(n) <= h(n') + c/. Which means, my heuristic needs to be *consistent* accross all the steps that I take, or - the cost of getting to the goal ( /h(n)/ ) from the current node /n/ must be less/equal to the same cost of one of /n/'s *successors* plus the *cost of transitioning* from /n/ to /n'/. If the algorithm *is consistent* then it implies it's also *admissible*.
+
+    This algorithm uses a lot of memory.
 
 * Adversarial search
+
+    In *adversarial searches* an algorithm faces an /"opponent"/ that tries to achieve the goal opposite of the algorithm itself, sort of a friend-or-foe situation, that's why it's often used in games such as *tic-tac-toe*.
+    One algorithm that we well observe here is the *Minimax* algorithm.
+
+** Minimax
+
+    This algor.
