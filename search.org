@@ -356,4 +356,83 @@ m.output_image("maze.png", show_explored=True) # prints the solution image
 
 ** Minimax
 
-    This algor.
+    We are going to take a look at a game of tic-tac-toe for this one. 2 players, *adversaries*, one player (let's call him *A*) is trying to win, and the other one (call him *B*) is trying to prevent the other one *from* winning. If *A wins* - we'll mark the win as *1*, if *B wins* - it will be *-1*, and if neither win it's a tie - or a *0*. In other words - player *A* is trying to *MAXIMIZE* the score, whislt the player *B* is trying to *MINIMIZE* it(hence the name - /MINIMAX/).
+
+    For our internal representation of the game, we'll need the following:
+        1. *The initial state* - we'll mark it with /S0/. In tic-tac-toe it's an *empty game board*.
+        2. *Player(s*) function - returns *which* player has the turn in a given state /s/ (player *A* or player *B*). Looks at the game board and determines this (probably checks who made more moves, whoever made less is on turn)
+        3. *Action(s)* - returns legal moves in state /s/. Returns a set of possible /"actions"/ .
+        4. *Result(s,a)* - returns state after action /a/ is taken in state /s/
+        5. *Terminal(s)* - checks if state /s/ is a terminal state
+        6. *Utility(s)* - gives us a numerical value for the terminal state /s/
+
+    In the *initial state* our game board is empty - no one made a move, it's the *root* of our tree. (someone at some point makes the first move)
+    There's 9 possible initial moves (for whichever player comes first - for example player *A*). And each one of those 9 moves has it's *child* /"moves"/ ( /nodes/ ), these *child moves* belong to the enemy(the other player - *B* for example). Then each and every one of those *children (enemy moves)* has its children(which are now the *A* player moves) and so on and so on...until we reach the *leaves* - which represent the *final possible states*.
+
+    So each "*level*" in a tree is essentially a number of possible options during any *player's turn*. And at each and every one of their turns, the players expand the tree to see "if I make this move, what can my *enemy do*?". In this process, the tree is expanded to it's /leaves/, and each /leaf/ is assigned a number representing the *RESULT* of the game finish.
+    Starting from the leaf, and going upwards the tree hierarchy, to the current state, each /node/ is then assigned a number - based on whose turn is it, the player who *MINIMIZES* or *MAXIMIZES*, and also the numbers of their children.
+    [[https://cs50.harvard.edu/ai/2020/notes/0/minimax_tictactoe.png][Refer to this picture for the following example:]]
+
+        Say if we have 5 leaves with the following values:
+        (1),                    (0),                (-1),               (0),                    (1) <- let's assume that the previous player went for the *MAX* value, what would it pick?
+         /                          /                       \                    \                      /
+         MAX(1)         MAX(0)                  \                 MAX(0)            /    <--- well, if this  was *MAX*'s move, before that it was *MIN*'s move!
+            \                   /                            \                    /                 /
+                MIN(0)                                      MIN(-1)                    /        <--- before that it was *MAX*'s turn again!
+                    \                                                  /                        /
+                        ------------------MAX(1)----------------------
+
+    From this silly representation of a tree(turned 180 degrees) we can see how this works, we have one tree for searching, each level is one player's turn - this also means each level's number is determined by who the player is( whether we're *MAXING* or *MINIMIZING* the score ), and also the values of all of that node's direct children ( we pick the *MAX/MIN* among them ).Those /"children"/ get the scores from *their children* and so on until we reach the *leaf nodes*. So we're sort of alternating between *MINIMIZING* and *MAXIMIZING* between each player's turn (tree level).
+    Each of these tree nodes are returned by recursively calling *ACTION(S)* and *RESULT(s,a)* from the current state /s/.
+    One thing to keep in mind, we're considering the *POSSIBLE FUTURE* states, it isn't guaranteed that one player will choose a particular *ACTION* to lead to a *STATE* we imagined would be best for us. This would happen if AI played versus a human.
+
+*** Pseudocode
+
+    1. Given a state /s/:
+       a. *MAX* picks action /a/ in *ACTIONS(s)* that produces the *highest* value of *MIN-VALUE(RESULT(s,a))*. This means
+       b. *MIN* picks action /a/ in *ACTIONS(s)* that produces the *smallest* value of *MAX-VALUE(RESULT(s,a))*. This means
+
+#+BEGIN_EXAMPLE :tangle no
+function MAX-VALUE(state):
+    if TERMINAL(state):
+        return UTILITY(state)
+    v = -infinite
+    for action in ACTONS(state):
+        v = MAX(v, MIN-VALUE( RESULT ( state, action )))
+    return v
+#+END_EXAMPLE
+
+
+
+* Optimizations
+
+    Because the original Minimax takes a lot of space, we need to find a way to optimize it (both space and time)
+    To do the required optimization, we'll use something called *Alpha-Beta pruning* and *Depth limited Minimax*.
+
+** Alpha-Beta pruning
+
+    This technique essentially relies on "pruning" unwanted branches of the tree, the ones which almost guarantee will have unfavorable choice for the current player. How do we find this out?
+    Let's suppose it's *MAX* player's turn (player *A*), and he's faced with 3 options that *MIN* player (player *B*) /could/ make in the next turn.
+    Each of these 3 options were selected based upon what, again, player *A* ( *MAX* ) /could/ do when player *B* makes a hypothetical move.
+    Say we have the following [[https://cs50.harvard.edu/ai/2020/notes/0/alphabeta.png][situation]]:
+
+                                                                                                                       4                        <--- this is the player *A* ( *MAX* )
+                                                                                                          /            |            \
+                                                                                                        4            3            2          <--- this is the player *B* ( *MIN* )
+                                                                                                    /   |   \     /  |  \       /  |  \
+                                                                                                4      8    5 9  3   X   2   X    X   <--- this is the player *A* again ( *MAX* )
+
+    From this we can notice we have 3 groups:
+        1. The last layer has 3 groups, each with 3 options, it's a branch that chose *MAX* values:
+           a. The first branch has the numbers ( 4, 8, 5 )
+           b. The second is the numbers ( 9, 3 and unknown )
+           c. The third one only has 2, and the rest are unknown
+        Well, what's with the unknowns? The "/unknowns/" are branches that were *pruded*. Why did we prude *them* specifically? Well, we know that from the first group we'll get *4* (because it's *MIN*'s turn, and well, 4 is the smallest of the 3 numbers). From a perspective of a *MIN* player, 4 is *THE WORST* it could do( 2nd layer ), but from the perspective of the *MAX* player, it's currently *THE BEST POSITION* it can be in! So, if *all the other* branches have a number *<4* associated with them, we can *prune* them, because numbers *less than* the biggest one would put the player *A* ( *MAX* ) in a worse position! (vice-versa for the player *B* ). There's no need to traverse the entire hierarchy of the tree, if we know that the player *A* notices a *3* in the second group, even there *may be a smaller value* (2 or 1 even), 3 is *already* less than 4, and that would put player *A* in a bad spot, there is no need to continue the traversal of that *subtree*. Same thing with the 3rd group, luckily on the first try we notice that the number is 2, which is *even worse* than group 2
+
+** Depth-limited Minimax
+
+    We basically limit how *deep* (after a certain number of moves) the Minimax can go in the tree hierarchy.
+    But what do we do if the game still isn't over?
+
+    To do this we'll need to add another piece of terminology called *evaluation function* which is basically a function that /estimates/ the expected utility of the game from a given state, or in other words, assigns values to states which try to /describe/ how favorable a specific *state* is for the player.
+    This function is *essential* for a properly functioning AI in practice, because exploring the entire tree of a game like *chess* wouldn't be possible!
